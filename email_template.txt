@@ -1,0 +1,21 @@
+Subject: Request for CRSP and Compustat Data - Project 2
+
+Dear Professor/TA [Name],
+
+I am working on Project 2 (Cost of Equity Estimation for Non-Listed Firms) and need access to the required datasets:
+
+1. **CRSP Data**: Monthly stock returns from January 2015 to December 2020
+   - Variables needed: CUSIP, RET, EWRETD
+   - Filters: Non-missing CUSIP and RET
+
+2. **Compustat Data**: Annual fundamentals for fiscal year 2020
+   - Variables needed: FYEAR, FYR, CUSIP, SIC, DT, PRCC_F, CSHO
+   - Filters: FYR=12, non-missing CUSIP and SIC, DT>=0, PRCC_F>0, CSHO>0
+
+Could you please provide these datasets or let me know how I can access them? I would prefer CSV format if possible.
+
+Thank you for your assistance!
+
+Best regards,
+[Your Name]
+[Your Student ID]

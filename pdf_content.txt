@@ -1,0 +1,142 @@
+1 
+ Instructions  for Project 2 —Using Leverage and Stock Market Information to Estimate Cost of 
+Equity  for Non -Listed Firms  
+Do NOT circulate this material outside of class  
+Your project will have the following  steps:  
+- Obtain data from CRSP and Compustat  
+- Use nonlist.csv, which will be provided for data on non- listed firms   
+- Write the program to perform the task  
+- Include detailed comments, explaining every step of your code  
+Submit the code as a Python program on Bb.  
+• CRSP data  
+1. 2015 /01 – 2020 /12 – 72 monthly observ ations ( 6 years), varies by firm  
+2. Retrieve the following variables   
+ CUSIP   
+ RET (holding period return)  
+ ewretd (equal -weighted return, including distributions)  
+3. Conditions set at the time of retrieving data  
+ CUSIP  – non-missing  
+ RET – non-missing  
+• COMPUSTAT  data  
+1. Retrieve the following variables  
+ FYEAR    fiscal year  
+ FYR    fiscal year end  
+ CUSIP  
+ SIC    standard industry classification code  
+ DT    total debt including current  
+ PRCC_F   price close –  annual – fiscal  
+ CSHO    common shares outstanding  
+2. Conditions set at the  time of retrieving data  
+ FYEAR  = 2020  
+ FYR = 12 
+ CUSIP  – non-missing  
+ SIC – non-missing  
+2 
+  DT >= 0 
+ PRCC_F  > 0 
+ CSHO  > 0 
+Your task is to estimate  the cost of equity (R e) for hypothetical non- listed fi rms in various 
+industries (nonlist.csv) using  market information on US public firms operating in the same 
+industries  and the leverage ratios of these non- listed firms . 
+The main steps are:  
+ Estimate equity betas for the  public firms  using monthly returns on their shares and 
+monthly returns on the marke t portfolio over the same period. You will do this by 
+estimating an OLS (Ordinary Least Squares) regression for each company with at least the 
+minimum required number of observations , which is 30, using  a model known as the 
+market model : 
+ 
+RET it = intercept t + βi × Market return t + εit 
+ 
+βi will be the estimate of each company’s beta or systematic risk.  For market re turn you 
+will use the equal- weighted average return on a stock index available from CRSP.  
+ 
+You will extract all betas , along with corresponding company codes (cusips), in a separate 
+dataframe to then merge  with company data from Compustat, which has information on 
+their leverage (D/E ratio) . 
+ 
+ Since the companies in the s ample may have debt in their capital structure, the estimated 
+betas are levered. To estimate industry average beta, you w ill need to first un -lever the  
+betas of these companies to remove the financial risk effect due to their leverage and 
+leave only business risk. You will use company D/E ratios to perform this task.  
+ 
+ After un -levering the betas you will sort the firms into industries based on their SIC codes 
+(3-digit) and will calculate the average unlevered beta for each industry. To obtain good 
+quality estimates, only industries with at least 5 firms will be used. The rest w ill be 
+discarded. Industry average un -levered betas and industry codes will be extracted in a 
+new dataframe to merge with the list of non -listed firms (to be provided) to calculate their 
+cost of equity.  
+  
+ 
+  
+3 
+ To write the code please use the following steps  to guide yourself.  
+• Import the following Python libraries  
+1. pandas       
+2. statsmodels.api   
+• Read both data files  
+• Display the first and last few rows and eyeball the data  
+• Check what types of variables you have —objects & numbers (integers or floats)  
+• Show the descriptive statistics for both dataframes  
+• From the dataframe  that has the stock market  data , keep only those firms (CUSIPS) that 
+have at least 3 0 monthly returns.  
+• Estimate the market model for each company separately and extract the beta 
+coeffici ent as follows:  
+Method 1  
+1. Define a function that would execute an OLS regression with an intercept  and return 
+the parameters (params) from the regression  
+2. Apply the function  to your dataframe that has stock market data, grouped by CUSIP , 
+with  the dependent ( y) variable as  RET and the independent (x) variable as the 
+return on the stock index  (vwretd or ewretd) . The dataframe with the extracted 
+regression parameters and CUSIPs should be named param s. 
+ 
+OR 
+ 
+Method 2  
+ Apply the lambda x  one-line function directly to extract the model parameters.  
+ 
+• Print and take a look at param s. The coefficient of the market index, which is your 
+estimated beta, has the same name  as the market index ( ewretd), r ename it as beta .  
+ 
+• In the dataframe with Compustat data:  
+ 
+1. extract  the first 8 digits from variable cusip and create  variable CUSIP , comparable to 
+the CUSIP variable in CRSP;  
+2. create variable sic3 based on sic;  
+3. calculate DE ratio as: total debt / (price per share * #shares outstanding) ;  
+4 
+ 4. drop extra columns that you will not be  using.  
+ 
+• Create a new dataframe by merging param s and t he dataframe that has the DE ratio , 
+based on CUSIP.  
+ 
+• Print and take a look at the new dataframe . 
+ 
+• Create a new variable and name it beta0, by using the DE ratio and un- levering the 
+estimated betas. Assume that tax rate is 30%  and βD = 0. 
+ 
+• Check how many firms are in each sic3 code with the help of groupby().count()  
+ 
+• Keep only industries (sic3) that have at least 5 o bservations  (that is, 5 firms).  
+ • Create a new dataframe , which has the industry means for the calculated beta0 , grouped 
+by sic3, and name the new dataframe ibetas . 
+ 
+• Print and take a look at ibetas. 
+ 
+• Read the ‘nonlist.csv’ file and create a dataframe named nl . This is a file with 
+information on hypothetical non -listed firms with their sic3 codes and D/E ratios.  
+ • Take a look at nl .  
+ • Create a new dataframe by mer ging ibetas  and non -listed firms based on sic3  and take a 
+look at it . Each non -listed firm now has an un -levered beta estimate based on the 
+industry aver age of un- levered betas of its publicly traded industry counterparts.  
+ • Using the target D/E ratios (de) of non -listed firms, estimate their cost of equity , R
+e. 
+Assume that the risk free rate  is 4.5%, the market risk premium is 8%, the tax rate is 30 %, 
+and βD = 0. Note, we have assumed that β D = 0, that is, debt is risk -free, which means that 
+the borrowing rate is the same as the risk -free rate, 4 .5%.  
+ 
+There are two ways you can go:  
+ 
+1. Lever up the un-levered beta , then use CAPM to get R e. 
+2. Use CAPM with un- levered beta to get R 0, then use Proposition II to get R e.   
+ 
+
