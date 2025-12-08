@@ -32,19 +32,19 @@ print("\n[STEP 1] Loading data files...")
 
 # Load CRSP data (monthly stock returns)
 try:
-    crsp = pd.read_csv('crsp_monthly_returns.csv')
+    crsp = pd.read_csv('crsp_data.csv')
     print(f"✓ Loaded CRSP data: {len(crsp):,} observations")
 except FileNotFoundError:
-    print("✗ Error: 'crsp_monthly_returns.csv' not found")
+    print("✗ Error: 'crsp_data.csv' not found")
     print("  Please ensure the CRSP data file is in the current directory")
     exit(1)
 
 # Load Compustat data (firm financials)
 try:
-    compustat = pd.read_csv('compustat_2020.csv')
+    compustat = pd.read_csv('compustat_data.csv')
     print(f"✓ Loaded Compustat data: {len(compustat):,} firms")
 except FileNotFoundError:
-    print("✗ Error: 'compustat_2020.csv' not found")
+    print("✗ Error: 'compustat_data.csv' not found")
     print("  Please ensure the Compustat data file is in the current directory")
     exit(1)
 
@@ -127,7 +127,7 @@ print(f"Total observations after filtering: {len(crsp_filtered):,}")
 # ============================================================================
 
 print("\n[STEP 6] Estimating market model and extracting betas...")
-print("Running OLS regression: RET = intercept + beta × EWRETD + error")
+print("Running OLS regression: RET = intercept + beta × ewretd + error")
 
 # Method 1: Define a function to run OLS regression
 def estimate_beta(group):
@@ -147,7 +147,7 @@ def estimate_beta(group):
     """
     # Prepare dependent variable (y) and independent variable (x)
     y = group['RET']
-    x = group['EWRETD']
+    x = group['ewretd']
     
     # Add constant (intercept) to the model
     x = sm.add_constant(x)
@@ -173,8 +173,8 @@ print("\nParameters dataframe (first 10 rows):")
 print(params.head(10))
 
 # Rename the market index coefficient to 'beta'
-# The coefficient name is 'EWRETD' (same as the independent variable)
-params.rename(columns={'EWRETD': 'beta'}, inplace=True)
+# The coefficient name is 'ewretd' (same as the independent variable)
+params.rename(columns={'ewretd': 'beta'}, inplace=True)
 
 print("\nAfter renaming (first 10 rows):")
 print(params.head(10))
@@ -186,16 +186,16 @@ print(params.head(10))
 print("\n[STEP 8] Processing Compustat data...")
 
 # Extract first 8 digits of CUSIP for matching with CRSP
-compustat['CUSIP'] = compustat['CUSIP'].astype(str).str[:8]
+compustat['CUSIP'] = compustat['cusip'].astype(str).str[:8]
 print("✓ Extracted 8-digit CUSIP")
 
 # Create 3-digit SIC code
-compustat['sic3'] = compustat['SIC'].astype(str).str[:3].astype(int)
+compustat['sic3'] = compustat['sic'].astype(str).str[:3].astype(int)
 print("✓ Created 3-digit SIC code (sic3)")
 
 # Calculate D/E ratio: Total Debt / Market Value of Equity
 # Market Value of Equity = Price per Share × Shares Outstanding
-compustat['DE'] = compustat['DT'] / (compustat['PRCC_F'] * compustat['CSHO'])
+compustat['DE'] = compustat['dt'] / (compustat['prcc_f'] * compustat['csho'])
 print("✓ Calculated D/E ratio")
 
 # Keep only necessary columns
